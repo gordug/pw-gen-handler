@@ -1,12 +1,10 @@
-
-# Azure Functions artifacts
-bin
-obj
-appsettings.json
-local.settings.json
 target
 cargo.lock
 .vscode
+
+# Azure Functions artifacts
+appsettings.json
+local.settings.json
 
 # Azurite artifacts
 __blobstorage__
