@@ -1,7 +1,9 @@
+mod options;
+
 use std::{env, net::Ipv4Addr};
 use tracing::{info};
 use warp::{http::Response, Filter};
-use serde::Deserialize;
+use options::{PasswordOptions, PasswordTypes} ;
 use pw_gen::password::{PasswordGenerator, generator::Generator};
 
 #[tracing::instrument]
@@ -10,8 +12,9 @@ async fn main() {
     let port_key = "FUNCTIONS_CUSTOMHANDLER_PORT";
     let port: u16 = match env::var(port_key) {
         Ok(val) => val.parse().expect("Custom Handler port is not a number!"),
-        Err(_) => 3000,
+        _ => 3000,
     };
+    println!("Starting server on port {}", port);
 
     let routes = warp::get()
         .and(warp::path("api"))
@@ -28,59 +31,41 @@ async fn main() {
     warp::serve(routes).run((Ipv4Addr::UNSPECIFIED, port)).await;
 }
 
-#[derive(Debug, Deserialize)]
-struct PasswordOptions {
-    length: u8,
-    special: bool,
-    numbers: bool,
-    lowercase: bool,
-    uppercase: bool,
-    no_ambiguous: bool,
-    no_similar: bool,
-    no_sequential: bool,
-}
+
 
 #[tracing::instrument]
 fn generate_password (option: Option<PasswordOptions>) -> String {
-    let options = option.unwrap_or(PasswordOptions {
-        length: 16,
-        special: true,
-        numbers: true,
-        lowercase: true,
-        uppercase: true,
-        no_ambiguous: true,
-        no_similar: true,
-        no_sequential: true,
-    });
+    let options = option.unwrap_or(PasswordOptions::default());
     let length = options.length;
     info!("Generating password with length {} and options {:?}", length, options);
     let mut generator = &mut Generator::new(length as usize);
 
-    if options.special {
-        generator = generator.with_special(None);
+    for password_type in options.password_type.unwrap_or(options::default_password_type()) {
+        match password_type {
+            PasswordTypes::Special { required } => {
+                generator = generator.with_special(required);
+            }
+            PasswordTypes::Numbers { required } => {
+                generator = generator.with_numbers(required);
+            }
+            PasswordTypes::Lowercase { required } => {
+                generator = generator.with_lowercase(required);
+            }
+            PasswordTypes::Uppercase { required } => {
+                generator = generator.with_uppercase(required);
+            }
+        }
     }
 
-    if options.numbers {
-        generator = generator.with_numbers(None);
-    }
-
-    if options.lowercase {
-        generator = generator.with_lowercase(None);
-    }
-
-    if options.uppercase {
-        generator = generator.with_uppercase(None);
-    }
-
-    if options.no_ambiguous {
+    if options.no_ambiguous.unwrap_or(false) {
         generator = generator.without_ambiguous();
     }
 
-    if options.no_similar {
+    if options.no_similar.unwrap_or(false) {
         generator = generator.without_similar();
     }
 
-    if options.no_sequential {
+    if options.no_sequential.unwrap_or(false) {
         generator = generator.without_sequential();
     }
 
