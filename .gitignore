@@ -4,6 +4,9 @@ bin
 obj
 appsettings.json
 local.settings.json
+target
+cargo.lock
+.vscode
 
 # Azurite artifacts
 __blobstorage__
