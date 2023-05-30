@@ -6,7 +6,7 @@ use tracing::{info};
 pub(crate) fn generate_password (option: Option<PasswordOptions>) -> String {
     let options = option.unwrap_or(PasswordOptions::default());
     let length = options.length;
-    info!("Generating password with length {} and options {:?}", length, options);
+    info!("Generating password with length {} and options {:#?}", length, options);
     let mut generator = &mut Generator::new(length as usize);
 
     for password_type in options.password_type.unwrap_or(options::default_password_type()) {
@@ -40,7 +40,5 @@ pub(crate) fn generate_password (option: Option<PasswordOptions>) -> String {
 
     let password = generator.generate();
 
-
-    info!("Generated password: {}", password);
     password
 }
