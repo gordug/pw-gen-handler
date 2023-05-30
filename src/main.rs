@@ -3,8 +3,6 @@ mod options;
 
 
 use std::{env, net::Ipv4Addr};
-use tracing::{log::info};
-use tracing_subscriber::{EnvFilter};
 use warp::{http::Response, Filter};
 
 #[tracing::instrument]
@@ -22,13 +20,6 @@ async fn main() {
     tracing_subscriber::fmt()
         .event_format(format)
         .init();
-
-    let subscriber = tracing_subscriber::FmtSubscriber::builder()
-        .with_env_filter(EnvFilter::from_default_env())
-        .with_writer(std::io::stderr)
-        .with_ansi(true)
-        .with_filter_reloading()
-        .finish();
 
     // Get port from environment variable
     let port_key = "FUNCTIONS_CUSTOMHANDLER_PORT";
