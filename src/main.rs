@@ -3,6 +3,7 @@ mod options;
 
 
 use std::{env, net::Ipv4Addr};
+use options::PasswordOptions;
 use warp::{http::Response, Filter};
 
 #[tracing::instrument]
@@ -46,6 +47,16 @@ async fn main() {
                 .header("Content-Type", "text/plain")
                 .body(password)
         })
+        // Send default options if no body is provided as an example
+        .or(warp::any().map(|| {
+            let body = "Password requests must be sent with a JSON body to the /api/GeneratePassword endpoint with the following format:\n\n"
+                    .to_owned()
+                    + &serde_json::to_string_pretty(&PasswordOptions::default()).unwrap_or("Error Generating Example!".to_owned());
+            Response::builder()                
+                .status(400)
+                .header("Content-Type", "text/plain")
+                .body(body)
+        }))
 
         // Add tracing
         .with(warp::trace::request());

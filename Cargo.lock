@@ -493,6 +493,7 @@ dependencies = [
  "pw-gen",
  "rand",
  "serde",
+ "serde_json",
  "tokio",
  "tracing",
  "tracing-subscriber",

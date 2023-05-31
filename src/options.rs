@@ -1,6 +1,6 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub(crate) struct PasswordOptions {
     pub length: u8,
     pub password_type: Option<Vec<PasswordTypes>>,
@@ -38,7 +38,7 @@ pub(crate) fn default_password_type() -> Vec<PasswordTypes> {
     ]
 }
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub(crate) enum PasswordTypes {
     Special {
         required: Option<bool>,
