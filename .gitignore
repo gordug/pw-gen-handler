@@ -1,6 +1,5 @@
 target
 cargo.lock
-.vscode
 
 # Azure Functions artifacts
 appsettings.json
